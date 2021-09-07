@@ -151,14 +151,16 @@ def t_event(ex, **kwargs):
         return _t_event_f128(ex, **kwargs)
 
 
-def from_sympy(ex):
+def from_sympy(ex, s_dict = {}):
     from ._sympy_utils import _with_sympy, _from_sympy_impl
+
+    # TODO check s_sdict.
 
     if not _with_sympy:
         raise ImportError(
             "The 'from_sympy()' function is not available because sympy is not installed")
 
-    return _from_sympy_impl(ex)
+    return _from_sympy_impl(ex, s_dict, {})
 
 
 # Machinery for the setup of the serialization backend.

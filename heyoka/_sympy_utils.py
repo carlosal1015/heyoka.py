@@ -152,22 +152,34 @@ def _build_fmap():
 _fmap = _build_fmap()
 
 
-def _from_sympy_function(func):
-    args = [_from_sympy_impl(arg) for arg in func.args]
+def _from_sympy_function(func, s_dict, c_dict):
+    args = [_from_sympy_impl(arg, s_dict, c_dict) for arg in func.args]
 
     tp = type(func)
 
     if not tp in _fmap:
-        raise TypeError("Unable to convert the sympy function {}".format(tp))
+        raise TypeError("Unable to convert the sympy object {}".format(func))
 
     return _fmap[tp](*args)
 
 
-def _from_sympy_impl(ex):
+def _from_sympy_impl(ex, s_dict, c_dict):
+    if ex in s_dict:
+        return s_dict[ex]
+
+    if ex in c_dict:
+        return c_dict[ex]
+
     if isinstance(ex, _spy.Number):
-        return _from_sympy_number(ex)
+        ret = _from_sympy_number(ex)
+        c_dict[ex] = ret 
+        return ret
 
     if isinstance(ex, _spy.Symbol):
-        return _from_sympy_symbol(ex)
+        ret = _from_sympy_symbol(ex)
+        c_dict[ex] = ret
+        return ret
 
-    return _from_sympy_function(ex)
+    ret = _from_sympy_function(ex, s_dict, c_dict)
+    c_dict[ex] = ret
+    return ret
